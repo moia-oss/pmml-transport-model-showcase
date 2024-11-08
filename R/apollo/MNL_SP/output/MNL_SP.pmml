@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_4" xmlns:data="http://jpmml.org/jpmml-model/InlineTable" version="4.4">
+	<Header>
+		<Application name="R2PMML package" version="0.28.0"/>
+		<Timestamp>2024-11-08T11:02:04Z</Timestamp>
+	</Header>
+	<DataDictionary>
+		<DataField name="choice" optype="categorical" dataType="string">
+			<Value value="car"/>
+			<Value value="bus"/>
+			<Value value="air"/>
+			<Value value="rail"/>
+		</DataField>
+		<DataField name="av_car" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="av_bus" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="av_air" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="av_rail" optype="continuous" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+		</DataField>
+		<DataField name="time_car" optype="continuous" dataType="double"/>
+		<DataField name="cost_car" optype="continuous" dataType="double"/>
+		<DataField name="time_bus" optype="continuous" dataType="double"/>
+		<DataField name="access_bus" optype="continuous" dataType="double"/>
+		<DataField name="cost_bus" optype="continuous" dataType="double"/>
+		<DataField name="time_air" optype="continuous" dataType="double"/>
+		<DataField name="access_air" optype="continuous" dataType="double"/>
+		<DataField name="cost_air" optype="continuous" dataType="double"/>
+		<DataField name="service_air" optype="continuous" dataType="double"/>
+		<DataField name="time_rail" optype="continuous" dataType="double"/>
+		<DataField name="access_rail" optype="continuous" dataType="double"/>
+		<DataField name="cost_rail" optype="continuous" dataType="double"/>
+		<DataField name="service_rail" optype="continuous" dataType="double"/>
+	</DataDictionary>
+	<MiningModel functionName="classification">
+		<MiningSchema>
+			<MiningField name="choice" usageType="target"/>
+			<MiningField name="av_car"/>
+			<MiningField name="av_bus"/>
+			<MiningField name="av_air"/>
+			<MiningField name="av_rail"/>
+			<MiningField name="time_car"/>
+			<MiningField name="cost_car"/>
+			<MiningField name="time_bus"/>
+			<MiningField name="access_bus"/>
+			<MiningField name="cost_bus"/>
+			<MiningField name="time_air"/>
+			<MiningField name="access_air"/>
+			<MiningField name="cost_air"/>
+			<MiningField name="service_air"/>
+			<MiningField name="time_rail"/>
+			<MiningField name="access_rail"/>
+			<MiningField name="cost_rail"/>
+			<MiningField name="service_rail"/>
+		</MiningSchema>
+		<Segmentation multipleModelMethod="modelChain">
+			<Segment id="1">
+				<True/>
+				<RegressionModel functionName="regression">
+					<MiningSchema>
+						<MiningField name="time_car"/>
+						<MiningField name="cost_car"/>
+					</MiningSchema>
+					<Output>
+						<OutputField name="utility(car)" optype="continuous" dataType="double" isFinalResult="false"/>
+						<OutputField name="exp(utility(car))" optype="continuous" dataType="double" feature="transformedValue" isFinalResult="false">
+							<Apply function="exp">
+								<FieldRef field="utility(car)"/>
+							</Apply>
+						</OutputField>
+					</Output>
+					<RegressionTable intercept="0.0">
+						<NumericPredictor name="time_car" coefficient="-0.011602184888146183"/>
+						<NumericPredictor name="cost_car" coefficient="-0.0587559393883261"/>
+					</RegressionTable>
+				</RegressionModel>
+			</Segment>
+			<Segment id="2">
+				<True/>
+				<RegressionModel functionName="regression">
+					<MiningSchema>
+						<MiningField name="time_bus"/>
+						<MiningField name="access_bus"/>
+						<MiningField name="cost_bus"/>
+					</MiningSchema>
+					<Output>
+						<OutputField name="utility(bus)" optype="continuous" dataType="double" isFinalResult="false"/>
+						<OutputField name="exp(utility(bus))" optype="continuous" dataType="double" feature="transformedValue" isFinalResult="false">
+							<Apply function="exp">
+								<FieldRef field="utility(bus)"/>
+							</Apply>
+						</OutputField>
+					</Output>
+					<RegressionTable intercept="0.06241069125884298">
+						<NumericPredictor name="time_bus" coefficient="-0.017368461479965833"/>
+						<NumericPredictor name="access_bus" coefficient="-0.023192675919152347"/>
+						<NumericPredictor name="cost_bus" coefficient="-0.0587559393883261"/>
+					</RegressionTable>
+				</RegressionModel>
+			</Segment>
+			<Segment id="3">
+				<True/>
+				<RegressionModel functionName="regression">
+					<MiningSchema>
+						<MiningField name="time_air"/>
+						<MiningField name="access_air"/>
+						<MiningField name="cost_air"/>
+						<MiningField name="service_air"/>
+					</MiningSchema>
+					<Output>
+						<OutputField name="utility(air)" optype="continuous" dataType="double" isFinalResult="false"/>
+						<OutputField name="exp(utility(air))" optype="continuous" dataType="double" feature="transformedValue" isFinalResult="false">
+							<Apply function="exp">
+								<FieldRef field="utility(air)"/>
+							</Apply>
+						</OutputField>
+					</Output>
+					<LocalTransformations>
+						<DerivedField name="term(air, 5)" optype="continuous" dataType="double">
+							<Apply function="if">
+								<Apply function="equal">
+									<FieldRef field="service_air"/>
+									<Constant dataType="double">2.0</Constant>
+								</Apply>
+								<Constant dataType="double">1.0</Constant>
+								<Constant dataType="double">0.0</Constant>
+							</Apply>
+						</DerivedField>
+						<DerivedField name="term(air, 6)" optype="continuous" dataType="double">
+							<Apply function="if">
+								<Apply function="equal">
+									<FieldRef field="service_air"/>
+									<Constant dataType="double">3.0</Constant>
+								</Apply>
+								<Constant dataType="double">1.0</Constant>
+								<Constant dataType="double">0.0</Constant>
+							</Apply>
+						</DerivedField>
+					</LocalTransformations>
+					<RegressionTable intercept="0.23827657599914548">
+						<NumericPredictor name="time_air" coefficient="-0.01948336939838334"/>
+						<NumericPredictor name="access_air" coefficient="-0.023192675919152347"/>
+						<NumericPredictor name="cost_air" coefficient="-0.0587559393883261"/>
+						<NumericPredictor name="term(air, 5)" coefficient="0.9375554437749389"/>
+						<NumericPredictor name="term(air, 6)" coefficient="0.40955971572898714"/>
+					</RegressionTable>
+				</RegressionModel>
+			</Segment>
+			<Segment id="4">
+				<True/>
+				<RegressionModel functionName="regression">
+					<MiningSchema>
+						<MiningField name="time_rail"/>
+						<MiningField name="access_rail"/>
+						<MiningField name="cost_rail"/>
+						<MiningField name="service_rail"/>
+					</MiningSchema>
+					<Output>
+						<OutputField name="utility(rail)" optype="continuous" dataType="double" isFinalResult="false"/>
+						<OutputField name="exp(utility(rail))" optype="continuous" dataType="double" feature="transformedValue" isFinalResult="false">
+							<Apply function="exp">
+								<FieldRef field="utility(rail)"/>
+							</Apply>
+						</OutputField>
+					</Output>
+					<LocalTransformations>
+						<DerivedField name="term(rail, 5)" optype="continuous" dataType="double">
+							<Apply function="if">
+								<Apply function="equal">
+									<FieldRef field="service_rail"/>
+									<Constant dataType="double">2.0</Constant>
+								</Apply>
+								<Constant dataType="double">1.0</Constant>
+								<Constant dataType="double">0.0</Constant>
+							</Apply>
+						</DerivedField>
+						<DerivedField name="term(rail, 6)" optype="continuous" dataType="double">
+							<Apply function="if">
+								<Apply function="equal">
+									<FieldRef field="service_rail"/>
+									<Constant dataType="double">3.0</Constant>
+								</Apply>
+								<Constant dataType="double">1.0</Constant>
+								<Constant dataType="double">0.0</Constant>
+							</Apply>
+						</DerivedField>
+					</LocalTransformations>
+					<RegressionTable intercept="-1.4813697046727883">
+						<NumericPredictor name="time_rail" coefficient="-0.006364930616137925"/>
+						<NumericPredictor name="access_rail" coefficient="-0.023192675919152347"/>
+						<NumericPredictor name="cost_rail" coefficient="-0.0587559393883261"/>
+						<NumericPredictor name="term(rail, 5)" coefficient="0.9375554437749389"/>
+						<NumericPredictor name="term(rail, 6)" coefficient="0.40955971572898714"/>
+					</RegressionTable>
+				</RegressionModel>
+			</Segment>
+			<Segment id="5">
+				<True/>
+				<RegressionModel functionName="classification" normalizationMethod="simplemax">
+					<MiningSchema>
+						<MiningField name="choice" usageType="target"/>
+						<MiningField name="av_car" missingValueReplacement="1" missingValueTreatment="asValue"/>
+						<MiningField name="av_bus" missingValueReplacement="1" missingValueTreatment="asValue"/>
+						<MiningField name="av_air" missingValueReplacement="1" missingValueTreatment="asValue"/>
+						<MiningField name="av_rail" missingValueReplacement="1" missingValueTreatment="asValue"/>
+						<MiningField name="exp(utility(car))"/>
+						<MiningField name="exp(utility(bus))"/>
+						<MiningField name="exp(utility(air))"/>
+						<MiningField name="exp(utility(rail))"/>
+					</MiningSchema>
+					<Output>
+						<OutputField name="probability(car)" optype="continuous" dataType="double" feature="probability" value="car"/>
+						<OutputField name="probability(bus)" optype="continuous" dataType="double" feature="probability" value="bus"/>
+						<OutputField name="probability(air)" optype="continuous" dataType="double" feature="probability" value="air"/>
+						<OutputField name="probability(rail)" optype="continuous" dataType="double" feature="probability" value="rail"/>
+					</Output>
+					<RegressionTable intercept="0.0" targetCategory="car">
+						<PredictorTerm name="interaction(av_car, exp(utility(car)))" coefficient="1.0">
+							<FieldRef field="av_car"/>
+							<FieldRef field="exp(utility(car))"/>
+						</PredictorTerm>
+					</RegressionTable>
+					<RegressionTable intercept="0.0" targetCategory="bus">
+						<PredictorTerm name="interaction(av_bus, exp(utility(bus)))" coefficient="1.0">
+							<FieldRef field="av_bus"/>
+							<FieldRef field="exp(utility(bus))"/>
+						</PredictorTerm>
+					</RegressionTable>
+					<RegressionTable intercept="0.0" targetCategory="air">
+						<PredictorTerm name="interaction(av_air, exp(utility(air)))" coefficient="1.0">
+							<FieldRef field="av_air"/>
+							<FieldRef field="exp(utility(air))"/>
+						</PredictorTerm>
+					</RegressionTable>
+					<RegressionTable intercept="0.0" targetCategory="rail">
+						<PredictorTerm name="interaction(av_rail, exp(utility(rail)))" coefficient="1.0">
+							<FieldRef field="av_rail"/>
+							<FieldRef field="exp(utility(rail))"/>
+						</PredictorTerm>
+					</RegressionTable>
+				</RegressionModel>
+			</Segment>
+		</Segmentation>
+	</MiningModel>
+</PMML>
