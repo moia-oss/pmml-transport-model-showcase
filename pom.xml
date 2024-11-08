@@ -12,6 +12,19 @@
         <maven.compiler.source>22</maven.compiler.source>
         <maven.compiler.target>22</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jpmml-version>1.6.4</jpmml-version>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.jpmml</groupId>
+            <artifactId>pmml-evaluator</artifactId>
+            <version>${jpmml-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jpmml</groupId>
+            <artifactId>pmml-evaluator-metro</artifactId>
+            <version>${jpmml-version}</version>
+        </dependency>
+    </dependencies>
 </project>
